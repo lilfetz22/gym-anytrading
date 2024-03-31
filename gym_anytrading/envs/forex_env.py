@@ -59,7 +59,7 @@ class MyForexEnv(TradingEnv):
                                                             (self.df['day_of_week'].shift(-1) == 'Tuesday')), 1, 0)
         
         # add the news event to the dataframe
-        path_to_news = 'C:\Users\WilliamFetzner\Documents\Trading\calendar_df_full.csv'
+        path_to_news = 'C:/Users/WilliamFetzner/Documents/Trading/calendar_df_full.csv'
         news_df = pd.read_csv(path_to_news)
 
         if 'Unnamed: 0' in news_df.columns:
