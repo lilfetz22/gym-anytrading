@@ -157,6 +157,12 @@ class MyForexEnv(TradingEnv):
         if trade or self._truncated:
             current_price = self.prices[self._current_tick]
             last_trade_price = self.prices[self._last_trade_tick]
+            # # bring in the spread data
+            # spread = pd.read_csv('spread_results_03_11_24_03_12_24.csv', index_col=0)
+            # # convert the column names and index to lowercase
+            # spread.columns = spread.columns.str.lower()
+            # spread.index = spread.index.str.lower()
+            
 
             if self.unit_side == 'left':
                 if self._position == Positions.Short:
@@ -165,7 +171,7 @@ class MyForexEnv(TradingEnv):
 
             elif self.unit_side == 'right':
                 if self._position == Positions.Long:
-                    quantity = self._total_profit / last_trade_price
+                    quantity = self._total_profit / last_trade_price # quantity is to get the number of lots
                     self._total_profit = quantity * (current_price - self.trade_fee)
 
     def max_possible_profit(self):
