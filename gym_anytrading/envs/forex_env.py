@@ -4,15 +4,18 @@ import pandas as pd
 from .trading_env import TradingEnv, Actions, Positions
 
 
-class ForexEnv(TradingEnv):
+class MyForexEnv(TradingEnv):
 
-    def __init__(self, df, window_size, frame_bound, unit_side='right', render_mode=None):
+    def __init__(self, df, window_size, frame_bound, unit_side='right', render_mode=None, **kwargs):
         assert len(frame_bound) == 2
         assert unit_side.lower() in ['left', 'right']
 
         self.frame_bound = frame_bound
         self.unit_side = unit_side.lower()
         super().__init__(df, window_size, render_mode)
+
+        # get the additional parameters provided in kwargs
+        self.kwargs = kwargs
 
         # need to edit this
         self.trade_fee = 0.0003  # unit
@@ -29,9 +32,9 @@ class ForexEnv(TradingEnv):
 
         # calculate the sma of the open high low, close / 4 for 3 periods
         self.df['ohlc4'] = (self.df['close'] + self.df['open'] + self.df['high'] + self.df['low']) / 4
-        self.df['sma'] = self.df['ohlc4'].rolling(window=sma_length).mean()
+        self.df['sma'] = self.df['ohlc4'].rolling(window=self.kwargs['sma_length']).mean()
         # calculate the sma of sma3 for 3 periods
-        self.df['smoothing_sma'] = self.df['sma'].rolling(window=smoothing_sma).mean()
+        self.df['smoothing_sma'] = self.df['sma'].rolling(window=self.kwargs['smoothing_sma']).mean()
         # find the difference between sma and smoothing_sma
         self.df['sma_diff'] = self.df['sma'] - self.df['smoothing_sma']
         # find the sign of the sma_diff
