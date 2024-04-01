@@ -49,9 +49,6 @@ class MyForexEnv(TradingEnv):
                                                  (self.df['sma_sign'].shift(2) == 1), -1,
                                         np.where((self.df['sma_sign'] == 1) & (self.df['sma_sign'].shift(1) == 0) & 
                                                  (self.df['sma_sign'].shift(2) == -1), 1, 0))))
-        # when sma_crossover is 1 then buy, when sma_crossover is -1 then sell
-        self.df['sma_signal'] = np.where(self.df['sma_crossover'] == 1, 'buy',
-                                        np.where(self.df['sma_crossover'] == -1, 'sell', ''))
         
         # add the day of the week to the dataframe
         self.df['day_of_week'] = self.df.index.day_name()
@@ -125,6 +122,9 @@ class MyForexEnv(TradingEnv):
        'sma_diff', 'sma_sign', 'sma_crossover', 
        'bollinger_width', 'awesome_oscillator', 'day_of_week_transition',
        'news_event_5', 'secs_until_next_news_event']
+
+        # drop rows with null values in features
+        self.df = self.df.dropna(subset=features)
         
         signal_features = self.df.loc[:, features].to_numpy()[start:end]
 
