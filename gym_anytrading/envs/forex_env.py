@@ -113,9 +113,9 @@ class MyForexEnv(TradingEnv):
                 self.df.at[index, 'news_event_5'] = 1
 
                 # add a column for the width of bollinger bands
-        self.df['bollinger_width'] = finta.TA.BBWIDTH(renko_full_data, period=20)
+        self.df['bollinger_width'] = finta.TA.BBWIDTH(self.df, period=20)
         # add a column for the awesome oscillator
-        self.df['awesome_oscillator'] = finta.TA.AO(renko_full_data)
+        self.df['awesome_oscillator'] = finta.TA.AO(self.df)
 
 
         # calculates the difference between consecutive elements in the prices array using the np.diff function. 
@@ -124,7 +124,7 @@ class MyForexEnv(TradingEnv):
         # diff = np.insert(np.diff(prices), 0, 0)
 
         features = ['open', 'high', 'low', 'close', 'sma', 'smoothing_sma',
-       'sma_diff', 'sma_sign', 'sma_crossover', 'sma_signal',
+       'sma_diff', 'sma_sign', 'sma_crossover', 
        'bollinger_width', 'awesome_oscillator', 'day_of_week_transition',
        'news_event_5', 'secs_until_next_news_event']
         
