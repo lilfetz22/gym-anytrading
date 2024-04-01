@@ -7,7 +7,7 @@ from .trading_env import TradingEnv, Actions, Positions
 
 class MyForexEnv(TradingEnv):
 
-    def __init__(self, df, window_size, frame_bound, unit_side='right', render_mode=None, **kwargs):
+    def __init__(self, df, window_size, frame_bound, trade_fee, unit_side='right', render_mode=None, **kwargs):
         assert len(frame_bound) == 2
         assert unit_side.lower() in ['left', 'right']
 
@@ -20,10 +20,8 @@ class MyForexEnv(TradingEnv):
         # adjust all of the column names to lowercase
         self.df.columns = self.df.columns.str.lower()
 
-
-
         # need to edit this
-        self.trade_fee = 0.0003  # unit
+        self.trade_fee = trade_fee  # unit
 
     def _process_data(self):
         prices = self.df.loc[:, 'close'].to_numpy()
