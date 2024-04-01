@@ -18,7 +18,7 @@ class MyForexEnv(TradingEnv):
 
         super().__init__(df, window_size, render_mode)
         # adjust all of the column names to lowercase
-        self.df.columns = self.df.str.lower()
+        self.df.columns = self.df.columns.str.lower()
 
 
 
