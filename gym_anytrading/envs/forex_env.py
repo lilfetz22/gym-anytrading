@@ -13,6 +13,8 @@ class MyForexEnv(TradingEnv):
         self.frame_bound = frame_bound
         self.unit_side = unit_side.lower()
         super().__init__(df, window_size, render_mode)
+        # adjust all of the column names to lowercase
+        self.df.columns = self.df.str.lower()
 
         # get the additional parameters provided in kwargs
         self.kwargs = kwargs
@@ -21,7 +23,7 @@ class MyForexEnv(TradingEnv):
         self.trade_fee = 0.0003  # unit
 
     def _process_data(self):
-        prices = self.df.loc[:, 'Close'].to_numpy()
+        prices = self.df.loc[:, 'close'].to_numpy()
         start = self.frame_bound[0] - self.window_size
         end = self.frame_bound[1]
 
