@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import finta
 
 from .trading_env import TradingEnv, Actions, Positions
 
@@ -14,7 +15,7 @@ class MyForexEnv(TradingEnv):
         self.unit_side = unit_side.lower()
         # get the additional parameters provided in kwargs
         self.kwargs = kwargs
-        
+
         super().__init__(df, window_size, render_mode)
         # adjust all of the column names to lowercase
         self.df.columns = self.df.str.lower()
@@ -111,9 +112,12 @@ class MyForexEnv(TradingEnv):
             if not events_in_window.empty:
                 self.df.at[index, 'news_event_5'] = 1
 
+                # add a column for the width of bollinger bands
+        self.df['bollinger_width'] = finta.TA.BBWIDTH(renko_full_data, period=20)
+        # add a column for the awesome oscillator
+        self.df['awesome_oscillator'] = finta.TA.AO(renko_full_data)
 
 
-        # Step 2: Iterate over each row in self.df and
         # calculates the difference between consecutive elements in the prices array using the np.diff function. 
         # This results in an array that is one element shorter than the original prices array. To compensate for this, 
         # a zero is inserted at the beginning of the diff array using np.insert.
