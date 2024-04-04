@@ -7,7 +7,7 @@ from .trading_env import TradingEnv, Actions, Positions
 
 class MyForexEnv(TradingEnv):
 
-    def __init__(self, df, window_size, frame_bound, trade_fee, unit_side='right', render_mode=None, **kwargs):
+    def __init__(self, df, window_size, frame_bound, trade_fee, spread, spread_bool=False, unit_side='right', render_mode=None, **kwargs):
         assert len(frame_bound) == 2
         assert unit_side.lower() in ['left', 'right']
 
@@ -22,6 +22,9 @@ class MyForexEnv(TradingEnv):
 
         # need to edit this
         self.trade_fee = trade_fee  # unit
+
+        self.spread = spread
+        self.spread_bool = spread_bool
 
     def _process_data(self):
         prices = self.df.loc[:, 'close'].to_numpy()
@@ -142,13 +145,24 @@ class MyForexEnv(TradingEnv):
 
         if trade:
             current_price = self.prices[self._current_tick]
-            last_trade_price = self.prices[self._last_trade_tick]
-            price_diff = current_price - last_trade_price
 
-            if self._position == Positions.Short:
-                step_reward += -price_diff * 10000
-            elif self._position == Positions.Long:
-                step_reward += price_diff * 10000
+            if self.spread_bool:
+                if self._position == Positions.Short:
+                    last_trade_price = self.prices[self._last_trade_tick] - self.spread
+                    price_diff = current_price - last_trade_price
+                    step_reward += -price_diff * 10000
+                elif self._position == Positions.Long:
+                    last_trade_price = self.prices[self._last_trade_tick] + self.spread
+                    price_diff = current_price - last_trade_price
+                    step_reward += price_diff * 10000
+            else:
+                last_trade_price = self.prices[self._last_trade_tick]
+                price_diff = current_price - last_trade_price
+                if self._position == Positions.Short:
+                    step_reward += -price_diff * 10000
+                elif self._position == Positions.Long:
+                    step_reward += price_diff * 10000
+
 
         return step_reward
 
@@ -163,13 +177,7 @@ class MyForexEnv(TradingEnv):
         if trade or self._truncated:
             current_price = self.prices[self._current_tick]
             last_trade_price = self.prices[self._last_trade_tick]
-            # # bring in the spread data
-            # spread = pd.read_csv('spread_results_03_11_24_03_12_24.csv', index_col=0)
-            # # convert the column names and index to lowercase
-            # spread.columns = spread.columns.str.lower()
-            # spread.index = spread.index.str.lower()
-            
-
+          
             if self.unit_side == 'left':
                 if self._position == Positions.Short:
                     quantity = self._total_profit * (last_trade_price - self.trade_fee)
