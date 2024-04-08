@@ -10,3 +10,5 @@ dist/
 build/
 gym_anytrading/datasets/data/renko_full_data_81.csv
 gym_anytrading/datasets/data/renko_full_data_81_initial.csv
+gym_anytrading/datasets/data/renko_full_data_50.csv
+gym_anytrading/datasets/data/renko_full_data_65.csv
