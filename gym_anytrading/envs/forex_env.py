@@ -37,16 +37,16 @@ class MyForexEnv(TradingEnv):
         prices = prices[self.frame_bound[0]-self.window_size:self.frame_bound[1]]
 
         # calculate the sma of the open high low, close / 4 for 3 periods
-        self.df['ohlc4'] = (self.df['close'] + self.df['open'] + self.df['high'] + self.df['low']) / 4
-        self.df['sma'] = self.df['ohlc4'].rolling(window=self.kwargs['sma_length']).mean()
+        self.df.loc[:, 'ohlc4'] = (self.df['close'] + self.df['open'] + self.df['high'] + self.df['low']) / 4
+        self.df.loc[:, 'sma'] = self.df['ohlc4'].rolling(window=self.kwargs['sma_length']).mean()
         # calculate the sma of sma3 for 3 periods
-        self.df['smoothing_sma'] = self.df['sma'].rolling(window=self.kwargs['smoothing_sma']).mean()
+        self.df.loc[:, 'smoothing_sma'] = self.df['sma'].rolling(window=self.kwargs['smoothing_sma']).mean()
         # find the difference between sma and smoothing_sma
-        self.df['sma_diff'] = self.df['sma'] - self.df['smoothing_sma']
+        self.df.loc[:, 'sma_diff'] = self.df['sma'] - self.df['smoothing_sma']
         # find the sign of the sma_diff
-        self.df['sma_sign'] = np.sign(self.df['sma_diff'])
+        self.df.loc[:, 'sma_sign'] = np.sign(self.df['sma_diff'])
         # find where the sma_sign changes from 1 to -1 or -1 to 1 or from 1
-        self.df['sma_crossover'] = np.where((self.df['sma_sign'] == 1) & (self.df['sma_sign'].shift(1) == -1), 1, 
+        self.df.loc[:, 'sma_crossover'] = np.where((self.df['sma_sign'] == 1) & (self.df['sma_sign'].shift(1) == -1), 1, 
                                         np.where((self.df['sma_sign'] == -1) & (self.df['sma_sign'].shift(1) == 1), -1, 
                                         np.where((self.df['sma_sign'] == -1) & (self.df['sma_sign'].shift(1) == 0) & 
                                                  (self.df['sma_sign'].shift(2) == 1), -1,
@@ -78,14 +78,14 @@ class MyForexEnv(TradingEnv):
         # create a new column in self.df called 'news_event_5' and place a 1 in it if there is an event in the news_df_grouped 
         # dataframe that has a datetime that is within 5 minutes of the datetime in the self.df dataframe
         # first add a new column in self.df called datetime_5 that is the datetime column increased by 5 minutes
-        self.df['datetime_5'] = self.df.index + pd.Timedelta(minutes=5)
-        self.df['datetime_neg_5'] = self.df.index - pd.Timedelta(minutes=5)
+        self.df.loc[:, 'datetime_5'] = self.df.index + pd.Timedelta(minutes=5)
+        self.df.loc[:, 'datetime_neg_5'] = self.df.index - pd.Timedelta(minutes=5)
         # Step 2: Initialize the new column 'news_event_5' with 0s
-        self.df['news_event_5'] = 0
+        self.df.loc[:, 'news_event_5'] = 0
 
         # add the minutes until the next news event to the dataframe
         # Initialize the new column 'secs_until_next_news_event' with np.nan
-        self.df['secs_until_next_news_event'] = np.nan
+        self.df.loc[:, 'secs_until_next_news_event'] = np.nan
         news_g = news_df_grouped.copy()
 
         # Step 3: Iterate over each row in self.df and check for events in news_df_grouped
@@ -111,9 +111,9 @@ class MyForexEnv(TradingEnv):
                 self.df.at[index, 'news_event_5'] = 1
 
                 # add a column for the width of bollinger bands
-        self.df['bollinger_width'] = finta.TA.BBWIDTH(self.df, period=20)
+        self.df.loc[:, 'bollinger_width'] = finta.TA.BBWIDTH(self.df, period=20)
         # add a column for the awesome oscillator
-        self.df['awesome_oscillator'] = finta.TA.AO(self.df)
+        self.df.loc[:, 'awesome_oscillator'] = finta.TA.AO(self.df)
 
 
         # calculates the difference between consecutive elements in the prices array using the np.diff function. 
